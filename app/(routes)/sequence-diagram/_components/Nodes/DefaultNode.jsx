@@ -23,7 +23,7 @@ const DefaultNode = ({ data }) => {
         position={Position.Top}
         style={{
           borderRadius: 0,
-          top: '-8px',
+          top: '-4px',
           left: '30%',
           transform: 'translateX(-50%)',
           transition: 'opacity 0.3s',
@@ -36,7 +36,7 @@ const DefaultNode = ({ data }) => {
         position={Position.Top}
         style={{
           borderRadius: 0,
-          top: '-8px',
+          top: '-4px',
           left: '70%',
           transform: 'translateX(-50%)',
           transition: 'opacity 0.3s',
@@ -49,7 +49,7 @@ const DefaultNode = ({ data }) => {
         position={Position.Bottom}
         style={{
           borderRadius: 0,
-          bottom: '-8px',
+          bottom: '-4px',
           left: '30%',
           transform: 'translateX(-50%)',
           transition: 'opacity 0.3s',
@@ -62,7 +62,7 @@ const DefaultNode = ({ data }) => {
         position={Position.Bottom}
         style={{
           borderRadius: 0,
-          bottom: '-8px',
+          bottom: '-4px',
           left: '70%',
           transform: 'translateX(-50%)',
           transition: 'opacity 0.3s',

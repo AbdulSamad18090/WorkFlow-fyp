@@ -11,19 +11,33 @@ const CustomEdge = ({
   targetPosition,
   style = {},
   markerEnd,
-  step,
   label, // Added label prop
+  type = 'smoothstep', // Added type prop for dynamic path generation
 }) => {
-  const path = `M${sourceX},${sourceY} C${sourceX + 100},${sourceY} ${targetX - 100},${targetY} ${targetX},${targetY}`;
+  // Determine the path based on the edge type
+  let edgePath;
+  switch (type) {
+    case 'straight':
+      edgePath = getStraightPath({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition });
+      break;
+    case 'bezier':
+      edgePath = getBezierPath({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition });
+      break;
+    case 'step':
+      edgePath = getStepPath({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition });
+      break;
+    default: // smoothstep or any other custom curve
+      edgePath = `M${sourceX},${sourceY} C${sourceX + 100},${sourceY} ${targetX - 100},${targetY} ${targetX},${targetY}`;
+      break;
+  }
 
   return (
     <g>
       <path
         id={id}
         className="react-flow__edge-path"
-        d={path}
-        type='smoothstep'
-        style={{ ...style, strokeWidth: '2px', type:'smoothstep' }}
+        d={edgePath}
+        style={{ ...style, strokeWidth: '2px' }}
         markerEnd={markerEnd}
       />
       {label && (
@@ -41,3 +55,5 @@ const CustomEdge = ({
     </g>
   );
 };
+
+export default CustomEdge;

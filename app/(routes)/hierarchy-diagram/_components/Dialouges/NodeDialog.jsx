@@ -14,13 +14,13 @@ const NodeDialog = ({ isOpen, nodeData, onSave, onClose, onDelete }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-3 rounded shadow-lg w-80"> 
-        <h2 className="text-lg font-bold mb-3">Edit Node</h2> 
+      <div className="bg-white p-4 rounded shadow-lg w-full max-w-sm"> 
+        <h2 className="text-lg font-bold mb-3 text-center">Edit Node</h2> 
         <div className="mb-3">
           <label className="block text-sm font-semibold mb-1">Title</label> 
           <input
             type="text"
-            className="w-full border p-1 rounded"
+            className="w-full border p-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -29,7 +29,7 @@ const NodeDialog = ({ isOpen, nodeData, onSave, onClose, onDelete }) => {
           <label className="block text-sm font-semibold mb-1">Position</label>
           <input
             type="text"
-            className="w-full border p-1 rounded"
+            className="w-full border p-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
             value={position}
             onChange={(e) => setPosition(e.target.value)}
           />

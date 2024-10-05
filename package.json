@@ -16,6 +16,7 @@
     "@xyflow/react": "^12.1.1",
     "axios": "^1.7.7",
     "dagre": "^0.8.5",
+    "dom-to-image": "^2.6.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
     "mongoose": "^8.6.4",

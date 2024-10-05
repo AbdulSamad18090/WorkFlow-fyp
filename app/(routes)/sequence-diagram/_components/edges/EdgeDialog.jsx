@@ -5,7 +5,7 @@ const EdgeDialog = ({ open, onClose, onSave, onDelete, edgeData, onInputChange }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-4"> {/* Responsive width with margin */}
         <h2 className="text-xl font-semibold mb-4">Edit Edge</h2>
         <label className="block mb-2">
           Label
@@ -17,16 +17,7 @@ const EdgeDialog = ({ open, onClose, onSave, onDelete, edgeData, onInputChange }
             className="block w-full mt-1 p-2 border border-gray-300 rounded"
           />
         </label>
-        <label className="block mb-4">
-          Stroke Color
-          <input
-            type="color"
-            name="strokeColor"
-            value={edgeData.style?.stroke || '#333'}
-            onChange={onInputChange}
-            className="block mt-1"
-          />
-        </label>
+        
         <div className="flex justify-end space-x-2">
           <button
             onClick={onSave}

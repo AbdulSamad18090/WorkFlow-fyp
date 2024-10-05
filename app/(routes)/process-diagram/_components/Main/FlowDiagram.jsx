@@ -36,7 +36,7 @@ import SaveProjectDialog from "@/app/components/SaveProjectDialog/page";
 import axios from "axios";
 import { ImSpinner3 } from "react-icons/im";
 import { useParams } from "next/navigation";
-
+import domtoimage from "dom-to-image";
 const localStorageKey = "process-diagram-data";
 
 const nodeTypes = {
@@ -467,26 +467,87 @@ export default function FlowContainer() {
       console.log(JSON.parse(diagram?.diagram));
     }
   };
-
   const handleExportPng = () => {
     const flowElement = document.getElementById("react-flow");
-    html2canvas(flowElement).then((canvas) => {
-      const link = document.createElement("a");
-      link.href = canvas.toDataURL("image/png");
-      link.download = "diagram.png";
-      link.click();
+  
+    // Check if flowElement is defined
+    if (!flowElement) {
+      console.error('Flow element not found!');
+      return;
+    }
+  
+    // Create a temporary container to hold the diagram
+    const tempElement = flowElement.cloneNode(true);
+  
+    // Hide unwanted elements (backgrounds, minimaps, buttons, etc.)
+    const unwantedElements = tempElement.querySelectorAll('.button-class, .heading-class, .minimap-class, .background-class'); // Adjust selectors accordingly
+    unwantedElements.forEach((element) => {
+      element.style.display = 'none'; // Hide elements by changing their display style
     });
+  
+    // Append the cloned element to the body (temporarily)
+    document.body.appendChild(tempElement);
+  
+    // Use dom-to-image to create PNG
+    domtoimage.toPng(tempElement, { bgcolor: '#ffffff' }) // Optional: Set bgcolor to white if needed
+      .then((dataUrl) => {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = 'diagram.png';
+        link.click();
+      })
+      .catch((error) => {
+        console.error('Oops, something went wrong!', error);
+      })
+      .finally(() => {
+        // Remove the temporary element from the body
+        document.body.removeChild(tempElement);
+      });
   };
-
+  
   const handleExportPdf = () => {
     const flowElement = document.getElementById("react-flow");
-    html2canvas(flowElement).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF();
-      pdf.addImage(imgData, "PNG", 0, 0);
-      pdf.save("diagram.pdf");
+  
+    // Check if flowElement is defined
+    if (!flowElement) {
+      console.error('Flow element not found!');
+      return;
+    }
+  
+    // Create a temporary container to hold the diagram
+    const tempElement = flowElement.cloneNode(true);
+  
+    // Hide unwanted elements (backgrounds, minimaps, buttons, etc.)
+    const unwantedElements = tempElement.querySelectorAll('.button-class, .heading-class, .minimap-class, .background-class'); // Adjust selectors accordingly
+    unwantedElements.forEach((element) => {
+      element.style.display = 'none'; // Hide elements by changing their display style
     });
+  
+    // Append the cloned element to the body (temporarily)
+    document.body.appendChild(tempElement);
+  
+    // Use dom-to-image to create PNG for PDF
+    domtoimage.toPng(tempElement, { bgcolor: '#ffffff' }) // Optional: Set bgcolor to white if needed
+      .then((dataUrl) => {
+        const pdf = new jsPDF({
+          orientation: tempElement.offsetWidth > tempElement.offsetHeight ? 'landscape' : 'portrait',
+          unit: 'px',
+          format: [tempElement.offsetWidth, tempElement.offsetHeight]
+        });
+        pdf.addImage(dataUrl, 'PNG', 0, 0, tempElement.offsetWidth, tempElement.offsetHeight);
+        pdf.save('diagram.pdf');
+      })
+      .catch((error) => {
+        console.error('Oops, something went wrong!', error);
+      })
+      .finally(() => {
+        // Remove the temporary element from the body
+        document.body.removeChild(tempElement);
+      });
   };
+  
+
+
 
   useEffect(() => {
     setTimeout(() => {
@@ -512,7 +573,7 @@ export default function FlowContainer() {
       <div className="flex-grow relative pt-1">
         <div
           id="react-flow"
-          className="relative w-full h-[99vh] border border-gray-300 rounded-lg bg-gray-50 pl-1"
+          className="relative w-full h-full md:h-screen border border-gray-300 bg-gray-50 pl-1"
         >
           <ReactFlow
             nodes={nodes}
@@ -522,7 +583,7 @@ export default function FlowContainer() {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            fitView
+            fitView={{padding :40}}
             onNodeDoubleClick={handleNodeDoubleClick}
             onEdgeDoubleClick={handleEdgeDoubleClick} // Handle double-click on edges
             onInit={setReactFlowInstance}
@@ -531,16 +592,16 @@ export default function FlowContainer() {
             minZoom={0.3}
             style={{ width: "80%", height: "130%" }}
           >
-            <div className="font-bold pl-4 pt-3 text-2xl">
+          <div className="font-bold pl-4 pt-3 text-l md:text-2xl lg:text-3xl">
               <h1>PROCESS DIAGRAM</h1>
             </div>
             <MiniMap />
             <Controls />
             <Background />
           </ReactFlow>
-          <div className="absolute top-2 right-2 space-x-2">
+          <div className="absolute top-2 right-2 flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
             <button
-              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 md:px-3 md:py-2"
               onClick={() => {
                 const exists = localStorage.getItem("Res");
                 if (!exists) {
@@ -554,19 +615,19 @@ export default function FlowContainer() {
               {isSaving ? "Saving..." : "Save"}
             </button>
             <button
-              className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+              className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 md:py-2"
               onClick={handleRestoreDiagram}
             >
               Restore
             </button>
             <button
-              className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+              className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 md:py-2"
               onClick={handleExportPng}
             >
               Export PNG
             </button>
             <button
-              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 md:py-2"
               onClick={handleExportPdf}
             >
               Export PDF
@@ -575,7 +636,7 @@ export default function FlowContainer() {
         </div>
         {dialogOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-md">
               <h3 className="text-lg font-semibold mb-4">
                 {selectedNode ? "Edit Node" : "Add Node"}
               </h3>

@@ -34,7 +34,7 @@ const Header = () => {
       <div className="flex gap-2 items-center">
         <GiSpaceShuttle className="md:text-[35px] sm:text-sm icon text-blue-500" />
         <div className="md:text-[16px] sm:text-[12px] font-semibold">
-          OpenSpace - Home
+          OpenSpace - WorkFlow
         </div>
       </div>
       <div

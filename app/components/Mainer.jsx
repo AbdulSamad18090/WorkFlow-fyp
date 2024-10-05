@@ -72,15 +72,7 @@ export default function Home() {
     }
   };
 
-  const handleExport = (id) => {
-    const format = prompt("Enter format (png/pdf):");
-    if (format === "png" || format === "pdf") {
-      alert(`Exporting diagram ${id} as ${format}`);
-      // Add your export logic here
-    } else {
-      alert("Invalid format");
-    }
-  };
+
 
   const navigateToEditor = (type) => {
     const editorPath = type.split(" ").join("").toLowerCase();
@@ -314,12 +306,7 @@ export default function Home() {
                           >
                             Delete
                           </button>
-                          <button
-                            onClick={() => handleExport(project._id)}
-                            className="text-green-500 hover:underline"
-                          >
-                            Export
-                          </button>
+                        
                         </div>
                       </div>
                     ))}

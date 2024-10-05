@@ -15,9 +15,11 @@ const LargePictureNode = ({ data }) => {
           <img src={data.image} alt="Large Profile" className="w-full h-full object-cover" />
         </div>
       )}
-      <div className="mt-2">
-        <strong>{data.title}</strong>
-        <div className="text-sm">{data.position}</div>
+     <div className="mb-5 flex flex-col justify-center flex-1">
+        <strong className="break-words max-w-full">{data.title}</strong>
+        <div className="text-sm break-words max-w-full">
+          {data.position}
+        </div>
       </div>
       <Handle
         type="source"

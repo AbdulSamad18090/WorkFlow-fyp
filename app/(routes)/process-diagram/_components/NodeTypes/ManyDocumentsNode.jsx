@@ -17,8 +17,8 @@ export const ManyDocumentsNode = ({ data }) => {
           </div>
         </foreignObject>
       </svg>
-      <Handle type="source" position="bottom" id="bottom" style={{ bottom: '-5px', left: '50%', transform: 'translateX(-50%)', zIndex: 10 }} />
-      <Handle type="target" position="top" id="top" style={{ top: '-5px', left: '50%', transform: 'translateX(-50%)', zIndex: 10 }} />
+      <Handle type="source" position="bottom" id="bottom" style={{ bottom: '18px', left: '50%', transform: 'translateX(-50%)', zIndex: 10 }} className="bg-gray-800 opacity-0 hover:opacity-100"/>
+      <Handle type="target" position="top" id="top" style={{ top: '-2px', left: '50%', transform: 'translateX(-50%)', zIndex: 10 }} className="bg-gray-800 opacity-0 hover:opacity-100"/>
     </div>
   );
 };

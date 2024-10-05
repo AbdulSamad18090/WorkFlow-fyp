@@ -33,6 +33,7 @@ import SaveProjectDialog from "../../../../components/SaveProjectDialog/page";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
+import domtoimage from "dom-to-image";
 
 const localStorageKey = "flow-diagram-data";
 
@@ -190,9 +191,9 @@ export default function FlowDiagram() {
       nds.map((node) =>
         node.id === selectedNode.id
           ? {
-              ...node,
-              data: { ...node.data, label: nodeTitle, color: nodeColor },
-            }
+            ...node,
+            data: { ...node.data, label: nodeTitle, color: nodeColor },
+          }
           : node
       )
     );
@@ -287,23 +288,40 @@ export default function FlowDiagram() {
 
   const handleExportPng = () => {
     const flowElement = document.getElementById("react-flow");
-    html2canvas(flowElement).then((canvas) => {
-      const link = document.createElement("a");
-      link.href = canvas.toDataURL("image/png");
-      link.download = "diagram.png";
-      link.click();
-    });
+
+    // Using dom-to-image to create PNG
+    domtoimage.toPng(flowElement)
+      .then((dataUrl) => {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = 'diagram.png';
+        link.click();
+      })
+      .catch((error) => {
+        console.error('oops, something went wrong!', error);
+      });
   };
 
   const handleExportPdf = () => {
     const flowElement = document.getElementById("react-flow");
-    html2canvas(flowElement).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF();
-      pdf.addImage(imgData, "PNG", 0, 0);
-      pdf.save("diagram.pdf");
-    });
+
+    // Using dom-to-image to create PNG for PDF
+    domtoimage.toPng(flowElement)
+      .then((dataUrl) => {
+        const pdf = new jsPDF({
+          orientation: flowElement.offsetWidth > flowElement.offsetHeight ? 'landscape' : 'portrait',
+          unit: 'px',
+          format: [flowElement.offsetWidth, flowElement.offsetHeight]
+        });
+        pdf.addImage(dataUrl, 'PNG', 0, 0, flowElement.offsetWidth, flowElement.offsetHeight);
+        pdf.save('diagram.pdf');
+      })
+      .catch((error) => {
+        console.error('oops, something went wrong!', error);
+      });
   };
+
+
 
   useEffect(() => {
     setTimeout(() => {
@@ -317,18 +335,19 @@ export default function FlowDiagram() {
 
   return (
     <div
-      className="h-screen flex"
+      className="h-screen  flex "
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
-      <Sidebar
+      <Sidebar 
         onSetEdgeType={setSelectedEdgeType}
         selectedEdgeType={selectedEdgeType}
       />
-      <div className="flex-grow relative pt-1">
+      <div className="flex-grow relative overflow-auto  ">
         <div
           id="react-flow"
-          className="relative w-full h-[99vh] border border-gray-300 rounded-lg bg-gray-50 pl-1"
+          className="relative w-full h-full md:h-screen border border-gray-300 bg-gray-50 pl-1 "
+
         >
           <ReactFlow
             nodes={nodes}
@@ -338,20 +357,26 @@ export default function FlowDiagram() {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            fitView
+          fitView={{padding :40}}
+            minZoom={0.3}
+
+            style={{ width: '100%', height: '100%' }}  // Ensure it takes 100% of the parent
             onNodeDoubleClick={handleNodeDoubleClick}
             onEdgeDoubleClick={handleEdgeDoubleClick} // Handle double-click on edges
           >
-            <div className="font-bold pl-4 pt-3 text-2xl">
+            
+           <div className="font-bold pl-4 pt-3 text-l md:text-2xl lg:text-3xl ">
               <h1>FLOW DIAGRAM</h1>
+
             </div>
             <MiniMap />
             <Controls />
             <Background />
+
           </ReactFlow>
-          <div className="absolute top-2 right-2 space-x-2">
+          <div className="absolute top-2 right-2 flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
             <button
-              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 md:px-3 md:py-2"
               onClick={() => {
                 const exists = localStorage.getItem("Res");
                 if (!exists) {
@@ -365,19 +390,19 @@ export default function FlowDiagram() {
               {isSaving ? "Saving..." : "Save"}
             </button>
             <button
-              className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+              className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 md:px-3 md:py-2"
               onClick={handleRestoreDiagram}
             >
               Restore
             </button>
             <button
-              className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+              className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 md:px-3 md:py-2"
               onClick={handleExportPng}
             >
               Export PNG
             </button>
             <button
-              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 md:px-3 md:py-2"
               onClick={handleExportPdf}
             >
               Export PDF
@@ -386,8 +411,8 @@ export default function FlowDiagram() {
         </div>
         {dialogOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-              <h3 className="text-lg font-semibold mb-4">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-md">
+              <h3 className="text-lg font-semibold mb-4 text-center">
                 {selectedNode ? "Edit Node" : "Add Node"}
               </h3>
               <input

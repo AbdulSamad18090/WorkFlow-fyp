@@ -5,7 +5,7 @@ import { FaTrash } from 'react-icons/fa';
 const NodeDialog = ({ open, onClose, onSave, dialogData, onInputChange, onDelete }) => {
   return (
     <div className={`fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center ${open ? '' : 'hidden'}`}>
-      <div className="bg-white rounded-lg shadow-lg w-1/3 max-w-md p-6">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 mx-4"> {/* Adjusted width for responsiveness */}
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Configure Node</h3>
           <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
@@ -32,14 +32,14 @@ const NodeDialog = ({ open, onClose, onSave, dialogData, onInputChange, onDelete
             className="block w-full mt-1 border border-gray-300 rounded-lg"
           />
         </label>
-        <div className="flex justify-between">
-          <button onClick={onClose} className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition">
+        <div className="flex justify-between flex-wrap"> {/* Added flex-wrap for better alignment on small screens */}
+          <button onClick={onClose} className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition mb-2 sm:mb-0">
             Cancel
           </button>
-          <button onClick={() => onDelete(dialogData.nodeId)} className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition flex items-center">
+          <button onClick={() => onDelete(dialogData.nodeId)} className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition flex items-center mb-2 sm:mb-0">
             <FaTrash className="inline-block mr-2" /> Delete
           </button>
-          <button onClick={onSave} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition flex items-center">
+          <button onClick={onSave} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition flex items-center mb-2 sm:mb-0">
             <IoSave className="inline-block mr-2" /> Save
           </button>
         </div>

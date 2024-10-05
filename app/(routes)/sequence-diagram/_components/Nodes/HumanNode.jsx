@@ -7,13 +7,13 @@ const HumanNode = ({ data }) => {
   return (
     <div
       className="flex items-center justify-center rounded-lg shadow-md p-3 border border-gray-300"
-      style={{ backgroundColor: color, width: '150px', height: '150px' }} // Apply the dynamic background color
+      style={{ backgroundColor: color, width: '100px', height: '100px' }} // Apply the dynamic background color
     >
       <div className="text-center">
         {/* Inline SVG for a stick figure */}
         <svg
-          width="100"
-          height="100"
+          width="60"
+          height="60"
           viewBox="0 0 64 64"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -42,6 +42,21 @@ const HumanNode = ({ data }) => {
         id="target-bottom"
         type="target"
         position={Position.Bottom}
+        style={{ borderRadius: 0 }}
+      />
+     
+       <Handle
+        className="bg-gray-800 opacity-0 hover:opacity-100"
+        id="source-right"
+        type="source"
+        position={Position.Right}
+        style={{ borderRadius: 0 }}
+      />
+       <Handle
+        className="bg-gray-800 opacity-0 hover:opacity-100"
+        id="source-left"
+        type="source"
+        position={Position.Left}
         style={{ borderRadius: 0 }}
       />
     </div>

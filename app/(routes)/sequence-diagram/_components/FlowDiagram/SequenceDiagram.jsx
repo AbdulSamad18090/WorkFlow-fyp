@@ -30,6 +30,9 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { ImSpinner3 } from "react-icons/im";
+import ClassNode from '../Nodes/ClassNode';
+import NoteNode from '../Nodes/NoteNode';
+import FrameFragmentNode from '../Nodes/FrameFragmentNode';
 
 const localStorageKey = "Sequence-diagram-data";
 
@@ -41,6 +44,9 @@ const nodeTypes = {
   customNode: CustomNode,
   circleNode: CircleNode,
   rectangleNode: RectangleNode,
+  classNode: ClassNode,
+  noteNode: NoteNode,
+  frameFragmentNode: FrameFragmentNode,
   humanNode: HumanNode,
 };
 
@@ -93,21 +99,23 @@ const SequenceDiagram = () => {
 
   const onConnect = useCallback(
     (params) => {
-      const edgeType = dialogData.edgeStyle || "smoothstep"; // Use 'smoothstep' by default
+      const edgeType = dialogData.edgeStyle || 'straight';
+
+      // Define the new edge based on the selected edge style
       const newEdge = {
         ...params,
-        type: edgeType, // Set edge type to smoothstep
-        animated: edgeType === "dotted" ? false : true,
+        type: edgeType === 'arrow-smooth' ? 'smoothstep' : 'straight', // Use 'smoothstep' for the new edge type
+        animated: edgeType === 'dotted' ? false : true, // Disable animation for dotted lines
         style: {
-          stroke: "#333",
-          strokeWidth: "2px",
-          strokeDasharray: edgeType === "dotted" ? "5,5" : "0",
+          stroke: '#333',
+          strokeWidth: '2px',
+          strokeDasharray: edgeType === 'dotted' ? '5,5' : '0', // Dotted style for 'dotted' edges
         },
-        markerEnd: { type: MarkerType.ArrowClosed },
-        label: dialogData.edgeLabel || "",
+        markerEnd: { type: MarkerType.ArrowClosed }, // Arrow at the end of the edge
+        label: dialogData.edgeLabel || '',
       };
 
-      setEdges((eds) => addEdge(newEdge, eds));
+      setEdges((eds) => addEdge(newEdge, eds)); // Update edges in the state
     },
     [dialogData.edgeLabel, dialogData.edgeStyle, setEdges]
   );
@@ -170,11 +178,11 @@ const SequenceDiagram = () => {
         nds.map((node) =>
           node.id === nodeId
             ? {
-                ...node,
-                data: { label: title, color },
-                position: position || node.position,
-                type: nodeType,
-              }
+              ...node,
+              data: { label: title, color },
+              position: position || node.position,
+              type: nodeType,
+            }
             : node
         )
       );
@@ -210,10 +218,10 @@ const SequenceDiagram = () => {
       eds.map((edge) =>
         edge.id === id
           ? {
-              ...edge,
-              label,
-              style,
-            }
+            ...edge,
+            label,
+            style,
+          }
           : edge
       )
     );
@@ -313,27 +321,85 @@ const SequenceDiagram = () => {
   };
 
   const handleExportPng = () => {
-    const element = document.getElementById("react-flow");
-    html2canvas(element).then((canvas) => {
-      const dataURL = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = dataURL;
-      link.download = "diagram.png";
-      link.click();
+    const flowElement = document.getElementById("react-flow");
+  
+    // Check if flowElement is defined
+    if (!flowElement) {
+      console.error('Flow element not found!');
+      return;
+    }
+  
+    // Create a temporary container to hold the diagram
+    const tempElement = flowElement.cloneNode(true);
+  
+    // Hide unwanted elements (backgrounds, minimaps, buttons, etc.)
+    const unwantedElements = tempElement.querySelectorAll('.button-class, .heading-class, .minimap-class, .background-class'); // Adjust selectors accordingly
+    unwantedElements.forEach((element) => {
+      element.style.display = 'none'; // Hide elements by changing their display style
     });
+  
+    // Append the cloned element to the body (temporarily)
+    document.body.appendChild(tempElement);
+  
+    // Use dom-to-image to create PNG
+    domtoimage.toPng(tempElement, { bgcolor: '#ffffff' }) // Optional: Set bgcolor to white if needed
+      .then((dataUrl) => {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = 'diagram.png';
+        link.click();
+      })
+      .catch((error) => {
+        console.error('Oops, something went wrong!', error);
+      })
+      .finally(() => {
+        // Remove the temporary element from the body
+        document.body.removeChild(tempElement);
+      });
   };
-
+  
   const handleExportPdf = () => {
-    const element = document.getElementById("react-flow");
-    html2canvas(element).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const imgWidth = 210;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-      pdf.save("diagram.pdf");
+    const flowElement = document.getElementById("react-flow");
+  
+    // Check if flowElement is defined
+    if (!flowElement) {
+      console.error('Flow element not found!');
+      return;
+    }
+  
+    // Create a temporary container to hold the diagram
+    const tempElement = flowElement.cloneNode(true);
+  
+    // Hide unwanted elements (backgrounds, minimaps, buttons, etc.)
+    const unwantedElements = tempElement.querySelectorAll('.button-class, .heading-class, .minimap-class, .background-class'); // Adjust selectors accordingly
+    unwantedElements.forEach((element) => {
+      element.style.display = 'none'; // Hide elements by changing their display style
     });
+  
+    // Append the cloned element to the body (temporarily)
+    document.body.appendChild(tempElement);
+  
+    // Use dom-to-image to create PNG for PDF
+    domtoimage.toPng(tempElement, { bgcolor: '#ffffff' }) // Optional: Set bgcolor to white if needed
+      .then((dataUrl) => {
+        const pdf = new jsPDF({
+          orientation: tempElement.offsetWidth > tempElement.offsetHeight ? 'landscape' : 'portrait',
+          unit: 'px',
+          format: [tempElement.offsetWidth, tempElement.offsetHeight]
+        });
+        pdf.addImage(dataUrl, 'PNG', 0, 0, tempElement.offsetWidth, tempElement.offsetHeight);
+        pdf.save('diagram.pdf');
+      })
+      .catch((error) => {
+        console.error('Oops, something went wrong!', error);
+      })
+      .finally(() => {
+        // Remove the temporary element from the body
+        document.body.removeChild(tempElement);
+      });
   };
+  
+
 
   useEffect(() => {
     setTimeout(() => {
@@ -344,7 +410,7 @@ const SequenceDiagram = () => {
   return (
     <div>
       <ReactFlowProvider>
-        <div className="flex h-screen">
+        <div className="flex h-screen ">
           {/* Sidebar */}
           <Sidebar
             onDragStart={handleDragStart}
@@ -356,11 +422,11 @@ const SequenceDiagram = () => {
           />
 
           {/* React Flow Canvas */}
-          <div className="flex-grow relative pt-1">
+          <div className="flex-grow relative overflow-auto">
             {/* Container with border for diagram */}
             <div
               id="react-flow"
-              className="relative w-full h-[99vh] border border-gray-300 rounded-lg bg-gray-50 pl-1"
+              className="relative w-full h-full md:h-screen border border-gray-300 bg-gray-50 pl-1"
             >
               <ReactFlow
                 nodes={hideNodes ? [] : nodes}
@@ -375,8 +441,10 @@ const SequenceDiagram = () => {
                 onNodeDoubleClick={handleNodeDoubleClick}
                 onEdgeDoubleClick={handleEdgeDoubleClick} // Add edge double click handler
                 fitView
+                minZoom={0.3}
+                style={{ width: '100%', height: '100%' }}  // Ensure it takes 100% of the parent
               >
-                <div className="font-bold pl-4 pt-3 text-2xl">
+            <div className="font-bold pl-4 pt-3 text-l md:text-2xl lg:text-3xl">
                   <h1>SEQUENCE DIAGRAM</h1>
                 </div>
                 {showMiniMap && <MiniMap />}
@@ -385,9 +453,9 @@ const SequenceDiagram = () => {
               </ReactFlow>
 
               {/* Top-right buttons */}
-              <div className="absolute top-2 right-2 space-x-2">
+              <div className="absolute top-2 right-2 flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
                 <button
-                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 md:px-3 md:py-2"
                   onClick={() => {
                     const exists = localStorage.getItem("Res");
                     console.log(isOpenSaveDialog);
@@ -402,19 +470,19 @@ const SequenceDiagram = () => {
                   {isSaving ? "Saving..." : "Save"}
                 </button>
                 <button
-                  className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                  className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 md:px-3 md:py-2"
                   onClick={handleRestoreDiagram}
                 >
                   Restore
                 </button>
                 <button
-                  className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                  className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 md:px-3 md:py-2"
                   onClick={handleExportPng}
                 >
                   Export PNG
                 </button>
                 <button
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 md:px-3 md:py-2"
                   onClick={handleExportPdf}
                 >
                   Export PDF

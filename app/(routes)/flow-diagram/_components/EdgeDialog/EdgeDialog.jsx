@@ -12,7 +12,7 @@ export default function EdgeDialog({ edge, onSave, onDelete, onClose }) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+      <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg w-11/12 sm:w-96 md:w-[400px]">
         <h3 className="text-lg font-semibold mb-4">Edit Edge Title</h3>
         <input
           type="text"
