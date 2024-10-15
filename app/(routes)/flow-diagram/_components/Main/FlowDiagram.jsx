@@ -34,7 +34,7 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import domtoimage from "dom-to-image";
-
+import { DocumentNode } from "../NodeTypes/DocumentNode"; 
 const localStorageKey = "flow-diagram-data";
 
 const nodeTypes = {
@@ -50,6 +50,7 @@ const nodeTypes = {
   database: DatabaseNode,
   delay: DelayNode,
   preparation: PreparationNode,
+  document:DocumentNode,
 };
 
 const customEdgeTypes = {
@@ -101,28 +102,33 @@ export default function FlowDiagram() {
 
   const onConnect = useCallback(
     (params) => {
+      const edgeType = selectedEdgeType === 'bezierArrow' || selectedEdgeType === 'straightArrow' ? selectedEdgeType : 'smoothstep';
+      
       const newEdge = {
         ...params,
-        type: "smoothstep",
+        type: edgeType, // Set the correct edge type
         markerEnd:
-          selectedEdgeType === "arrow" || selectedEdgeType === "dotted"
+          selectedEdgeType === 'arrow' || 
+          selectedEdgeType === 'bezierArrow' || 
+          selectedEdgeType === 'straightArrow' || 
+          selectedEdgeType === 'dotted' // Ensure arrowhead for dotted edges
             ? { type: MarkerType.Arrow, width: 10, height: 10 }
             : undefined,
         style: {
-          stroke: "black",
-          strokeWidth: selectedEdgeType === "dotted" ? 2 : 2,
-          strokeDasharray: selectedEdgeType === "dotted" ? "3,3" : undefined,
+          stroke: 'black',
+          strokeWidth: 2,
+          strokeDasharray: selectedEdgeType === 'dotted' ? '3,3' : undefined, // Dotted style
         },
-        data: { label: "" }, // Initially empty label
-        label: "", // Ensure this is added
+        data: { label: '' }, // Empty label by default
+        label: '', // Ensure label is empty by default
       };
-
-      setPendingEdge(newEdge); // Set the new edge as pending
+  
+      setPendingEdge(newEdge);
       setSelectedEdge(newEdge); // Open dialog for setting title
     },
     [selectedEdgeType, setEdges]
   );
-
+  
   const handleEdgeSave = (edge, title) => {
     if (pendingEdge) {
       // Add the pending edge to the list of edges with the updated label

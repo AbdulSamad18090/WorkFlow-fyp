@@ -151,6 +151,25 @@ const Sidebar = ({ onSetEdgeType, selectedEdgeType }) => {
             onDragStart={handleDragStart}
             isCollapsed={isCollapsed}
           />
+           <DraggableButton
+              type="document"
+              label="Document Node"
+              Icon={(props) => (
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  {...props}
+                >
+                  {/* SVG for Document Node */}
+                  <path d="M4 4 H20 V18 Q12 22 4 18 Z" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              )}
+              onDragStart={handleDragStart}
+              isCollapsed={isCollapsed}
+            />
           <DraggableButton
             type="circle"
             label="Circle Node"
@@ -239,6 +258,19 @@ const Sidebar = ({ onSetEdgeType, selectedEdgeType }) => {
             </svg>
             <span className={`${isCollapsed ? 'hidden' : ''}`}>Arrow Edge</span>
           </button>
+          {/* New Bezier Arrow Edge */}
+  <button
+    onClick={() => onSetEdgeType('bezierArrow')}
+    className={`bg-white hover:bg-blue-300 text-black font-semibold py-2 px-4 rounded-lg flex items-center space-x-2 transition-all ${selectedEdgeType === 'bezierArrow' ? 'border-2 border-blue-500' : ''}`}
+  >
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ color: '#3b82f6' }}>
+      <path d="M5 12C5 9 9 5 12 5C15 5 19 9 19 12" stroke="currentColor" strokeWidth="2" />
+      <polygon points="18,12 12,16 12,8" fill="#3b82f6" />
+    </svg>
+    <span className={`${isCollapsed ? 'hidden' : ''}`}>Bezier Arrow</span>
+  </button>
+
+
           <button
             onClick={() => onSetEdgeType('dotted')}
             className={`bg-white hover:bg-blue-300 text-black font-semibold py-2 px-4 rounded-lg flex items-center space-x-2 transition-all ${selectedEdgeType === 'dotted' ? 'border-2 border-blue-500' : ''}`}

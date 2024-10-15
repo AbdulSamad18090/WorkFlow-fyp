@@ -1,20 +1,39 @@
 import React from 'react';
-import { getBezierPath } from 'reactflow';
+import { getBezierPath, getStraightPath } from 'reactflow';
 
-const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, markerEnd, data }) => {
-  const [edgePath] = getBezierPath({
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-    borderRadius: 0,
-  });
+const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, markerEnd, data, style, type }) => {
+  let edgePath;
 
-  // Calculate mid-point for the title position
+  if (type === 'bezierArrow') {
+    // Bezier path with arrow
+    edgePath = getBezierPath({
+      sourceX,
+      sourceY,
+      targetX,
+      targetY,
+      borderRadius: 0,
+    })[0];
+  } else if (type === 'straightArrow') {
+    // Straight path with arrow
+    edgePath = getStraightPath({
+      sourceX,
+      sourceY,
+      targetX,
+      targetY,
+    })[0];
+  } else {
+    // Default to smoothstep path for other edge types
+    edgePath = getBezierPath({
+      sourceX,
+      sourceY,
+      targetX,
+      targetY,
+      borderRadius: 0,
+    })[0];
+  }
+
   const titleX = (sourceX + targetX) / 2;
   const titleY = (sourceY + targetY) / 2;
-
-  // Define a slight offset to position the title above the edge
   const titleOffset = -15;
 
   return (
@@ -22,6 +41,7 @@ const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, markerEnd, data })
       <path
         id={id}
         d={edgePath}
+        style={style}
         stroke="black"
         strokeWidth={2}
         fill="none"
@@ -30,11 +50,11 @@ const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, markerEnd, data })
       {data?.label && (
         <text
           x={titleX}
-          y={titleY + titleOffset}  // Apply offset to position above the edge
+          y={titleY + titleOffset}
           textAnchor="middle"
           fill="black"
           fontSize="12"
-          alignmentBaseline="middle"  // Align text vertically
+          alignmentBaseline="middle"
         >
           {data.label}
         </text>
