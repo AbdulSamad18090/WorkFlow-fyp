@@ -32,23 +32,25 @@ const Header = () => {
   return (
     <div className="flex w-full justify-between leading-[60px] border-b px-8 bg-white sticky top-0 z-50 cursor-pointer shadow-sm">
       <div className="flex gap-2 items-center">
-        <GiSpaceShuttle className="md:text-[35px] sm:text-sm icon text-blue-500" />
-        <div className="md:text-[16px] sm:text-[12px] font-semibold">
-          OpenSpace - WorkFlow
-        </div>
+        {/* <GiSpaceShuttle className="md:text-[35px] sm:text-sm icon text-blue-500" /> */}
+        <Image src="/images/logo.png" width={50} height={50} alt="Profile" />
+        <div className="md:text-[16px] sm:text-[12px]">SIJM - WorkFlow</div>
       </div>
       <div
         className="flex items-center gap-2 relative"
         onClick={() => setShowDialog(!showDialog)}
       >
-        <FaQuestion className="text-lg text-blue-500" />
-        <div className="bg-blue-500 rounded-full p-[2px]">
-          <img
+        <span className="text-blue-500  text-base">
+          {authenticatedUser?.fullName || "Guest"}
+        </span>
+        {/* <FaQuestion className="text-lg text-blue-500" /> */}
+        <div className="bg-blue-500 rounded-full shadow-md overflow-hidden w-fit h-fit">
+          <Image
             src={profileImage}
-            width={35}
-            height={35}
+            width={40}
+            height={40}
             alt="Profile"
-            className="rounded-full"
+            className="rounded-full object-cover"
           />
         </div>
         {/* {showDialog && (
