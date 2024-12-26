@@ -4,9 +4,10 @@ import Mainer from "./components/Mainer.jsx";
 import { useSession } from "next-auth/react";
 import ErrorPage from "./components/ErrorPage/page.jsx";
 import { useRouter } from "next/navigation.js";
+import { ImSpinner8 } from "react-icons/im";
 
 const Page = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
@@ -18,8 +19,16 @@ const Page = () => {
     }
   }, [router]);
 
+  if (status === "loading") {
+    return (
+      <div className="w-full h-32 flex items-center justify-center p-5">
+        <ImSpinner8 className="text-3xl animate-spin" />
+      </div>
+    );
+  }
+
   // Show error page if no session is found
-  if (!session) {
+  if (!session && status !== "loading") {
     return <ErrorPage />;
   }
 

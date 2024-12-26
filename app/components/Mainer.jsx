@@ -22,11 +22,11 @@ export default function Home() {
 
   const fetchProjects = async () => {
     setIsfetchingProject(true);
-    console.log(session?.user?.userData?.id);
-    if (session?.user?.userData?.id) {
+    console.log(session?.user?.userData?._id);
+    if (session?.user?.userData?._id) {
       try {
         const res = await axios.get(
-          `/api/diagram/get/${session.user?.userData?.id}`
+          `/api/diagram/get/${session.user?.userData?._id}`
         );
         const projects = res?.data?.diagrams;
 
@@ -51,7 +51,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchProjects();
-  }, [session?.user?.userData?.id]);
+  }, [session?.user?.userData?._id]);
 
   const handleEdit = (type, id) => {
     const formattedType = type.toLowerCase().replace(/\s+/g, "-");

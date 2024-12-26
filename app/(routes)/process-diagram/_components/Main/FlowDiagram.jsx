@@ -431,7 +431,7 @@ export default function FlowContainer() {
       const local = JSON.parse(localStorage.getItem("Res"));
       // Make API request to save the diagram
       const res = await axios.post(
-        `/api/diagram/create/${session?.user?.userData?.id}`,
+        `/api/diagram/create/${session?.user?.userData?._id}`,
         {
           name: local?.diagram?.name || updatedDiagramData.name,
           diagram: JSON.stringify(updatedDiagramData.diagram), // Diagram serialized as a JSON string
