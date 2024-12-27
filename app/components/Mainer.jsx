@@ -1,13 +1,16 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Head from "next/head";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import { GoAlert } from "react-icons/go";
-import { fetchData } from "next-auth/client/_utils";
 import { ImSpinner3 } from "react-icons/im";
+import DiagramPreviewModal from "./DiagramPreviewModal/DiagramPreviewModal";
+import { FiEdit } from "react-icons/fi";
+import { AiOutlineDelete } from "react-icons/ai";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -16,13 +19,14 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [groupedProjects, setGroupedProjects] = useState({});
   const [isDeleteDialog, setIsDeleteDialog] = useState(false);
-  const [projectToDelete, setProjectToDelete] = useState(null); // Hold project to delete
+  const [projectToDelete, setProjectToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [selectedDiagram, setSelectedDiagram] = useState(null);
   const router = useRouter();
 
   const fetchProjects = async () => {
     setIsfetchingProject(true);
-    console.log(session?.user?.userData?._id);
     if (session?.user?.userData?._id) {
       try {
         const res = await axios.get(
@@ -30,7 +34,6 @@ export default function Home() {
         );
         const projects = res?.data?.diagrams;
 
-        // Grouping projects by type
         const grouped = projects.reduce((acc, project) => {
           const type = project.type;
           if (!acc[type]) {
@@ -61,18 +64,22 @@ export default function Home() {
   const handleDelete = async (id) => {
     setIsDeleting(true);
     try {
-      const res = await axios.delete(`/api/diagram/delete/${id}`);
-      setProjectToDelete(null); // Reset the project after deletion
-      setIsDeleteDialog(false);
+      await axios.delete(`/api/diagram/delete/${id}`);
+      setProjectToDelete(null);
       setIsDeleteDialog(false);
       fetchProjects();
     } catch (error) {
       console.log("Error =>", error);
       setIsDeleteDialog(false);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
-
+  const handleView = (project) => {
+    setSelectedDiagram(project);
+    setIsPreviewModalOpen(true);
+  };
 
   const navigateToEditor = (type) => {
     const editorPath = type.split(" ").join("").toLowerCase();
@@ -256,7 +263,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Loop through grouped projects by type */}
           {isfetchingProject ? (
             <div className="w-full flex justify-center">
               <ImSpinner3 className="text-4xl animate-spin" />
@@ -280,33 +286,41 @@ export default function Home() {
                     )
                     .map((project) => (
                       <div
-                        key={project.id}
-                        className="bg-white border border-gray-300 p-6 rounded-lg shadow-lg  hover:translate-x-10 transition-all flex justify-between items-center"
+                        key={project._id}
+                        className="bg-white border border-gray-300 p-6 rounded-lg shadow-lg hover:scale-105 transition-all flex justify-between items-center"
                       >
                         <div>
                           <h3 className="text-2xl font-semibold text-gray-800">
                             {project.name}
                           </h3>
                         </div>
-                        <div className="flex space-x-4">
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={() => handleView(project)}
+                            className="text-blue-500 hover:text-blue-600"
+                            aria-label="View diagram"
+                          >
+                            <FaEye size={20} />
+                          </button>
                           <button
                             onClick={() =>
-                              handleEdit(project?.type, project?._id)
+                              handleEdit(project.type, project._id)
                             }
-                            className="text-blue-500 hover:underline"
+                            className=" hover:text-neutral-700"
+                            aria-label="Edit diagram"
                           >
-                            Edit
+                            <FiEdit size={20} />
                           </button>
                           <button
                             onClick={() => {
-                              setIsDeleteDialog(true); // Set dialog open
-                              setProjectToDelete(project._id); // Set project to delete
+                              setIsDeleteDialog(true);
+                              setProjectToDelete(project._id);
                             }}
-                            className="text-red-500 hover:underline"
+                            className="text-red-500 hover:text-red-600"
+                            aria-label="Delete diagram"
                           >
-                            Delete
+                            <AiOutlineDelete size={20} />
                           </button>
-                        
                         </div>
                       </div>
                     ))}
@@ -317,36 +331,39 @@ export default function Home() {
         </div>
 
         {isDeleteDialog && (
-          <div className="fixed top-20 w-full h-fit z-50 flex justify-center">
-            <div className="bg-white w-[400px] h-fit p-4 rounded-lg shadow-lg border">
-              <div className="flex items-center gap-4">
+          <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center">
+            <div className="bg-white w-[400px] p-6 rounded-lg shadow-lg">
+              <div className="flex items-center gap-4 mb-4">
                 <GoAlert className="text-4xl text-yellow-500" />
                 <div>
-                  <h1 className="text-lg font-semibold">Are you sure!</h1>
-                  <p className="my-1 text-sm">Do you want to delete?</p>
+                  <h1 className="text-lg font-semibold">Are you sure?</h1>
+                  <p className="text-sm">Do you want to delete this project?</p>
                 </div>
               </div>
               <div className="flex justify-end items-center gap-2">
                 <button
-                  className="bg-gray-100 border border-gray-300 hover:bg-gray-200 px-6 transition-all rounded"
-                  onClick={() => {
-                    setIsDeleteDialog(false); // Close the dialog
-                  }}
+                  className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded transition-all"
+                  onClick={() => setIsDeleteDialog(false)}
                 >
-                  No
+                  Cancel
                 </button>
                 <button
-                  className="bg-blue-500 border border-gray-300 hover:bg-blue-600 text-white px-6 transition-all rounded"
-                  onClick={() => {
-                    handleDelete(projectToDelete); // Call delete with project ID
-                  }}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-all"
+                  onClick={() => handleDelete(projectToDelete)}
+                  disabled={isDeleting}
                 >
-                  {isDeleting ? "Deleting..." : "yes"}
+                  {isDeleting ? "Deleting..." : "Delete"}
                 </button>
               </div>
             </div>
           </div>
         )}
+
+        <DiagramPreviewModal
+          isOpen={isPreviewModalOpen}
+          onClose={() => setIsPreviewModalOpen(false)}
+          diagramData={selectedDiagram?.diagram || "{}"}
+        />
       </div>
     </div>
   );
