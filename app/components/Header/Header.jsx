@@ -15,7 +15,7 @@ const Header = () => {
   const router = useRouter();
 
   const { data: session } = useSession();
-  console.log("Session =>", session);
+  // console.log("Session =>", session);
 
   useEffect(() => {
     setAuthenticatedUser(session?.user?.userData);
@@ -25,7 +25,7 @@ const Header = () => {
     signOut({ callbackUrl: "/" });
   };
 
-  console.log("Authenticated User =>", authenticatedUser);
+  // console.log("Authenticated User =>", authenticatedUser);
 
   const profileImage = authenticatedUser?.image || "/avatar.png";
 

@@ -13,7 +13,7 @@ import { FiEdit } from "react-icons/fi";
 import { AiOutlineDelete } from "react-icons/ai";
 
 export default function Home() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [projects, setProjects] = useState([]);
   const [isfetchingProject, setIsfetchingProject] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,6 +24,16 @@ export default function Home() {
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [selectedDiagram, setSelectedDiagram] = useState(null);
   const router = useRouter();
+  const [workflowPermissions, setWorkflowPermissions] = useState([]);
+
+  // console.log("Session =>", session);
+  console.log("Workflow Permissions =>", workflowPermissions);
+
+  useEffect(() => {
+    setWorkflowPermissions(
+      session?.user?.userData?.role?.permissions?.workflowPermissions || []
+    );
+  }, [session, status]);
 
   const fetchProjects = async () => {
     setIsfetchingProject(true);
@@ -81,10 +91,40 @@ export default function Home() {
     setIsPreviewModalOpen(true);
   };
 
-  const navigateToEditor = (type) => {
-    const editorPath = type.split(" ").join("").toLowerCase();
-    router.push(`/edit/${editorPath}`);
+  const canCreate = (diagramName) => {
+    const workflowPerm = workflowPermissions.filter(
+      (diagram) => diagram.name === diagramName
+    );
+
+    return workflowPerm[0]?.create || false;
   };
+
+  const canEdit = (diagramName) => {
+    const workflowPerm = workflowPermissions.filter(
+      (diagram) => diagram.name === diagramName
+    );
+
+    return workflowPerm[0]?.edit || false;
+  };
+
+  const canDelete = (diagramName) => {
+    const workflowPerm = workflowPermissions.filter(
+      (diagram) => diagram.name === diagramName
+    );
+    return workflowPerm[0]?.delete || false;
+  };
+
+  const canView = (diagramName) => {
+    const workflowPerm = workflowPermissions.filter(
+      (diagram) => diagram.name === diagramName
+    );
+    return workflowPerm[0]?.view || false;
+  };
+
+  console.log("Can Create =>", canCreate("Flow Diagram"));
+  console.log("Can Edit =>", canEdit("Flow Diagram"));
+  console.log("Can Delete =>", canDelete("Flow Diagram"));
+  console.log("Can View =>", canView("Flow Diagram"));
 
   return (
     <div className="relative min-h-screen bg-white">
