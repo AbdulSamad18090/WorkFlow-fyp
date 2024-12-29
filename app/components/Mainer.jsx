@@ -11,6 +11,7 @@ import { ImSpinner3 } from "react-icons/im";
 import DiagramPreviewModal from "./DiagramPreviewModal/DiagramPreviewModal";
 import { FiEdit } from "react-icons/fi";
 import { AiOutlineDelete } from "react-icons/ai";
+import { useToast } from "./CustomToast/Toast";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -25,9 +26,11 @@ export default function Home() {
   const [selectedDiagram, setSelectedDiagram] = useState(null);
   const router = useRouter();
   const [workflowPermissions, setWorkflowPermissions] = useState([]);
+  const { showToast } = useToast();
 
   // console.log("Session =>", session);
   console.log("Workflow Permissions =>", workflowPermissions);
+  console.log("Grouped Projects =>", groupedProjects);
 
   useEffect(() => {
     setWorkflowPermissions(
@@ -121,10 +124,10 @@ export default function Home() {
     return workflowPerm[0]?.view || false;
   };
 
-  console.log("Can Create =>", canCreate("Flow Diagram"));
-  console.log("Can Edit =>", canEdit("Flow Diagram"));
-  console.log("Can Delete =>", canDelete("Flow Diagram"));
-  console.log("Can View =>", canView("Flow Diagram"));
+  // console.log("Can Create =>", canCreate("Flow Diagram"));
+  // console.log("Can Edit =>", canEdit("Flow Diagram"));
+  // console.log("Can Delete =>", canDelete("Flow Diagram"));
+  // console.log("Can View =>", canView("Flow Diagram"));
 
   return (
     <div className="relative min-h-screen bg-white">
@@ -189,7 +192,16 @@ export default function Home() {
         </h1>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           <div
-            onClick={() => router.push("/flow-diagram")}
+            onClick={() => {
+              if (canCreate("Flow Diagram")) {
+                router.push("/flow-diagram");
+              } else {
+                showToast(
+                  "You don't have a permission to create flow diagram.",
+                  "error"
+                );
+              }
+            }}
             className="bg-white border border-gray-300 p-8 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all flex flex-col items-center text-center cursor-pointer"
           >
             <svg
@@ -213,7 +225,16 @@ export default function Home() {
           </div>
 
           <div
-            onClick={() => router.push("/sequence-diagram")}
+            onClick={() => {
+              if (canCreate("Sequence Diagram")) {
+                router.push("/sequence-diagram");
+              } else {
+                showToast(
+                  "You don't have a permission to create sequence diagram.",
+                  "error"
+                );
+              }
+            }}
             className="bg-white border border-gray-200 p-8 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all flex flex-col items-center text-center cursor-pointer"
           >
             <svg
@@ -237,7 +258,16 @@ export default function Home() {
           </div>
 
           <div
-            onClick={() => router.push("/hierarchy-diagram")}
+            onClick={() => {
+              if (canCreate("Hierarchy Diagram")) {
+                router.push("/hierarchy-diagram");
+              } else {
+                showToast(
+                  "You don't have a permission to create heirarchy diagram.",
+                  "error"
+                );
+              }
+            }}
             className="bg-white border border-gray-200 p-8 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all flex flex-col items-center text-center cursor-pointer"
           >
             <svg
@@ -261,7 +291,16 @@ export default function Home() {
           </div>
 
           <div
-            onClick={() => router.push("/process-diagram")}
+            onClick={() => {
+              if (canCreate("Process Diagram")) {
+                router.push("/process-diagram");
+              } else {
+                showToast(
+                  "You don't have a permission to create process diagram.",
+                  "error"
+                );
+              }
+            }}
             className="bg-white border border-gray-200 p-8 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all flex flex-col items-center text-center cursor-pointer"
           >
             <svg
@@ -336,7 +375,16 @@ export default function Home() {
                         </div>
                         <div className="flex items-center gap-4">
                           <button
-                            onClick={() => handleView(project)}
+                            onClick={() => {
+                              if (canView(type)) {
+                                handleView(project);
+                              } else {
+                                showToast(
+                                  "You don't have a permission to view this diagram.",
+                                  "error"
+                                );
+                              }
+                            }}
                             className="text-blue-500 hover:text-blue-600"
                             aria-label="View diagram"
                           >
