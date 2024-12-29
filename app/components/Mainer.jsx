@@ -391,9 +391,16 @@ export default function Home() {
                             <FaEye size={20} />
                           </button>
                           <button
-                            onClick={() =>
-                              handleEdit(project.type, project._id)
-                            }
+                            onClick={() => {
+                              if (canEdit(type)) {
+                                handleEdit(project.type, project._id);
+                              } else {
+                                showToast(
+                                  "You don't have a permission to edit this diagram.",
+                                  "error"
+                                );
+                              }
+                            }}
                             className=" hover:text-neutral-700"
                             aria-label="Edit diagram"
                           >
@@ -401,8 +408,15 @@ export default function Home() {
                           </button>
                           <button
                             onClick={() => {
-                              setIsDeleteDialog(true);
-                              setProjectToDelete(project._id);
+                              if (canDelete(type)) {
+                                setIsDeleteDialog(true);
+                                setProjectToDelete(project._id);
+                              } else {
+                                showToast(
+                                  "You don't have a permission to delete this diagram.",
+                                  "error"
+                                );
+                              }
                             }}
                             className="text-red-500 hover:text-red-600"
                             aria-label="Delete diagram"
